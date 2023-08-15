@@ -3,7 +3,7 @@ import {useParams} from "react-router-dom"
 import initializeSocket from '../services/socketconnection';
 import { setLocalStream } from '../utils/StreamSetupjs';
 import { mediaConstraints } from '../utils/peersetup';
-function VideoCallRoom() {
+function CreatorRoom() {
 
   const { id } = useParams();
   const videoRef = useRef(null);
@@ -17,6 +17,7 @@ function VideoCallRoom() {
     socket.current.on('room_created', async (roomId) => {
       const stream = await setLocalStream(mediaConstraints);
       videoRef.current.srcObject = stream;
+      sessionStorage.setItem('isRoomCreator',true);
     });
   };
 
@@ -54,4 +55,4 @@ function VideoCallRoom() {
   );
 }
 
-export default VideoCallRoom;
+export default CreatorRoom;

@@ -8,7 +8,7 @@ export const Header = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const snapshot = await get(child(dbRef.current, `users/${uid}`));
+        const snapshot = await get(child(dbRef.current, `users/${uid()}`));
         if (snapshot.exists()) {
           console.log(snapshot.val().username);
           sessionStorage.setItem("name",snapshot.val().username);

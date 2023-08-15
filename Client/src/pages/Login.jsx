@@ -19,6 +19,7 @@ export default function Login() {
     signInWithEmailAndPassword(auth, field.email, field.password)
     .then((userCredential) => {
       const user = userCredential.user;
+      sessionStorage.setItem("uid",user.uid);
       console.log(user);
       nav("/");
     })

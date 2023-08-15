@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useNavigate,Outlet } from 'react-router-dom'
 import {uid} from "../utils/sessionstorage";
-export default function Roomoutlet() {
+export default function JoinOutlet() {
   const nav=useNavigate();
   console.log(uid());
   useEffect(()=>{
