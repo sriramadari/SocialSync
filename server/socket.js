@@ -1,4 +1,3 @@
-
 const express = require('express')
 const app = express()
 const server = require('http').createServer(app)
@@ -20,7 +19,7 @@ io.on('connection', (socket) => {
     const numberOfClients = roomClients ? roomClients.size : 0;
     console.log(numberOfClients);
 
-    // Rest of your code for handling room joining...
+    // handling room joining
     if (numberOfClients == 0) {
       const message=`Creating room ${roomId} and emitting room_created socket event`;
       console.log(message);
@@ -59,7 +58,6 @@ io.on('connection', (socket) => {
   });
 })
 
-// START THE SERVER =================================================================
 const port = process.env.PORT || 8080
 server.listen(port, () => {
   console.log(`Express server listening on port ${port}`)
