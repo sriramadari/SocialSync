@@ -1,10 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import {useParams} from "react-router-dom"
 import initializeSocket from '../services/socketconnection';
-import { setLocalStream,addLocalTracks } from '../utils/StreamSetupjs';
-import { mediaConstraints ,iceServers} from '../utils/peersetup';
-import { isRoomCreator } from '../utils/sessionstorage';
-function CreatorRoom() {
+// import { setLocalStream } from '../utils/StreamSetupjs';
+// import { mediaConstraints } from '../utils/peersetup';
+function RoomJoiner() {
 
   const { id } = useParams();
   const videoRef = useRef(null);
@@ -15,31 +14,26 @@ function CreatorRoom() {
     socket.current.emit('join', id);
 
     // Handle socket 'room_created' event
-    socket.current.on('room_created', async (roomId) => {
-      const stream = await setLocalStream(mediaConstraints);
+    socket.current.on('room_joined', async (roomId) => {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
       videoRef.current.srcObject = stream;
-      sessionStorage.setItem('isRoomCreator',true);
+      sessionStorage.setItem('isRoomCreator',false);
+      socket.current.emit('start_call', id)
     });
 
-    socket.current.on('start_call', async () => {
-      console.log('Socket event callback: start_call')
-      if (isRoomCreator()) {
-        rtcPeerConnection = new RTCPeerConnection(iceServers);
-        const localStream=videoRef.current.srcObject;
-        addLocalTracks(localStream,rtcPeerConnection);
-        console.log(rtcPeerConnection);
-        // rtcPeerConnection.ontrack = setRemoteStream
-        // rtcPeerConnection.onicecandidate = sendIceCandidate
-        await createOffer(rtcPeerConnection)
-      }
-    })
+    socket.current.on('full_room', () => {
+        console.log('Socket event callback: full_room')      
+        alert('The room is full, please try another one')
+      })
+      
   };
+
   const Disconnect = () => {
     if (socket.current) {
       socket.current.disconnect();
       socket.current = null;
       videoRef.current.srcObject = null;
-      sessionStorage.setItem('isRoomCreator',false);
+      console.log("disconnected");
     }
   };
 
@@ -57,16 +51,16 @@ function CreatorRoom() {
         onClick={Connect}
         className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
       >
-        Start Call
+        Start Connect
       </button>
       <button
         onClick={Disconnect}
         className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300 mt-2"
       >
-        End Call
+        Disconnect
       </button>
     </div>
   );
 }
 
-export default CreatorRoom;
+export default RoomJoiner;

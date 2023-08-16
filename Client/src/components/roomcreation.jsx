@@ -16,7 +16,12 @@ function RoomCreation() {
   return (
     <div className="flex flex-col items-center p-4">
     <h1 className="text-2xl font-bold mb-4">Create a Room</h1>
-    <input type="text" value={roomID} readonly className="w-full py-2 px-4 border rounded-lg mb-4" />
+    <input
+        type="text"
+        value={roomID}
+        readOnly={true} 
+        className="w-full py-2 px-4 border rounded-lg mb-4"
+      />
     <button onClick={generateRandomID} className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-2">
         Generate Random ID
     </button>

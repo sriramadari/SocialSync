@@ -10,6 +10,7 @@ import CreatorRoom from "./pages/CreatorRoom";
 import { Room } from './pages/Room';
 import { Joinroom } from './components/joinroom';
 import JoinOutlet from './pages/joinoutlet';
+import RoomJoiner from './pages/RoomJoiner';
 export default function App() {
    const [uid, setUid] = useState(null);
 
@@ -36,7 +37,7 @@ export default function App() {
         </Route>
         <Route path="/joinroom" element={<JoinOutlet/>}>
             <Route index element={<Joinroom/>}/>
-            <Route path=":id" element={<CreatorRoom/>}/>
+            <Route path=":id" element={<RoomJoiner/>}/>
           </Route>
       </Routes>
     </Router>

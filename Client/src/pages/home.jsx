@@ -2,13 +2,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { signOut } from "firebase/auth";
 import { auth } from '../services/firebase';
-import { uid } from '../utils/sessionstorage';
+import { uid,name,isRoomCreator} from '../utils/sessionstorage';
 
 function Home() {
   const handleLogout=()=>{
     signOut(auth).then(() => {
       console.log("user logged out");
       sessionStorage.removeItem("uid");
+      sessionStorage.removeItem("name");
+      sessionStorage.removeItem("isRoomCreator");
     }).catch((error) => {
       console.log(error);
     });
