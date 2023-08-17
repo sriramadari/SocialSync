@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import initializeSocket from "../services/socketconnection";
 import { setLocalStream,addLocalTracks ,setRemoteStream,sendIceCandidate,createAnswer}from '../utils/StreamSetupjs';
 import { mediaConstraints ,iceServers} from '../utils/peersetup';
-import { isRoomCreator } from "../utils/sessionstorage";
+import { Leftchatbar } from '../components/leftchatbar';
 function RoomJoiner() {
   const { id } = useParams();
   const videoRef = useRef(null);
@@ -57,16 +57,19 @@ function RoomJoiner() {
     });
   };
 
-  const Disconnect = () => {
+  const Disconnect = async() => {
     if (socket.current) {
       socket.current.disconnect();
       socket.current = null;
       videoRef.current.srcObject = null;
+      remoteVideoRef.current.srcObject = null;
+      // await navigator.mediaDevices.getUserMedia({video:false,audio:false});
       console.log("disconnected");
     }
   };
 
-  return (
+  return (<>
+    <Leftchatbar Id={id} />
     <div className="flex flex-col items-center justify-center h-screen">
       <h1 className="text-2xl font-bold mb-4">Video Call Room</h1>
       <div className="flex flex-row items-center">
@@ -97,6 +100,7 @@ function RoomJoiner() {
         Disconnect
       </button>
     </div>
+  </>
   );
 }
 

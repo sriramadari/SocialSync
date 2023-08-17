@@ -10,10 +10,29 @@ const io = require('socket.io')(server,{
 
 
 // app.use('/', express.static('public'))
-
+const userSockets = {};
 
 io.on('connection', (socket) => {
   console.log('A user connected with ID:',socket.id);
+
+    socket.on('set_user_id', (Id) => {
+      userSockets[Id] = socket;
+    });
+
+    socket.on('sending_message', ({ msg, Id }) => {
+      if (userSockets[Id]) {
+        userSockets[Id].emit('receiving_msg', { msg });
+      }
+    });
+    socket.on('disconnect', () => {
+      console.log('User disconnected:', socket.id);
+      const userId = Object.keys(userSockets).find(key => userSockets[key] === socket);
+      if (userId) {
+        delete userSockets[userId];
+      }
+    });
+
+
   socket.on('join', (roomId) => {
     const roomClients = io.sockets.adapter.rooms.get(roomId);
     const numberOfClients = roomClients ? roomClients.size : 0;
