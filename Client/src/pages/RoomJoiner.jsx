@@ -57,8 +57,9 @@ function RoomJoiner() {
       });
       console.log(rtcPeerConnection);
       //   }
-      socket.current.on("user disconnected", (event) => {
-        alert(event, " diconnected");
+      socket.current.on("user_disconnected", (event) => {
+        alert(event+" disconnected");
+        remoteVideoRef.current.srcObject=null;
       });
     });
 
@@ -70,13 +71,16 @@ function RoomJoiner() {
 
   const Disconnect = async () => {
     if (socket.current) {
-      socket.current.disconnect();
       let localStream = videoRef.current.srcObject;
+      console.log(localStream);
       rtcPeerConnection.removeStream(localStream);
-      rtcPeerConnection.close();
+      // rtcPeerConnection.close();
       localStream.getTracks().forEach((track) => track.stop());
       videoRef.current.srcObject = null;
-      socket.current.emit("user disconnected", { name, id });
+      const Name=name();
+      console.log(Name,id);
+      socket.current.emit("user_disconnected", { Name, id });
+      socket.current.disconnect();
       console.log("disconnected");
     }
   };

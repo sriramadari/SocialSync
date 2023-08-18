@@ -52,22 +52,26 @@ function CreatorRoom() {
         })
         console.log(rtcPeerConnection);
 
-        socket.current.on("user disconnected",(event)=>{
-          alert(event," diconnected");
+        socket.current.on("user_disconnected",(event)=>{
+          alert(event+" disconnected");
+          remoteVideoRef.current.srcObject=null;
         })
       }
     })
   };
   const Disconnect = async() => {
     if (socket.current) {
-      socket.current.disconnect();
       let localStream=videoRef.current.srcObject;
+      console.log(localStream)
       rtcPeerConnection.removeStream(localStream);
-      rtcPeerConnection.close();
+      
       localStream.getTracks().forEach((track) => track.stop())
     sessionStorage.setItem('isRoomCreator',false);
     videoRef.current.srcObject=null;
-      socket.current.emit("user disconnected",{name,id});
+    const Name=name();
+    console.log(name,id);
+      socket.current.emit("user_disconnected",{Name,id});
+      socket.current.disconnect();
       console.log("disconnected");
     }
   };
