@@ -58,8 +58,8 @@ function RoomJoiner() {
       console.log(rtcPeerConnection);
       //   }
       socket.current.on("user_disconnected", (event) => {
-        alert(event+" disconnected");
-        remoteVideoRef.current.srcObject=null;
+        alert(event + " disconnected");
+        remoteVideoRef.current.srcObject = null;
       });
     });
 
@@ -71,17 +71,27 @@ function RoomJoiner() {
 
   const Disconnect = async () => {
     if (socket.current) {
-      let localStream = videoRef.current.srcObject;
-      console.log(localStream);
-      rtcPeerConnection.removeStream(localStream);
-      // rtcPeerConnection.close();
-      localStream.getTracks().forEach((track) => track.stop());
-      videoRef.current.srcObject = null;
-      const Name=name();
-      console.log(Name,id);
-      socket.current.emit("user_disconnected", { Name, id });
-      socket.current.disconnect();
-      console.log("disconnected");
+      if (rtcPeerConnection == null) {
+        let localStream = videoRef.current.srcObject;
+        localStream.getTracks().forEach((track) => track.stop());
+        sessionStorage.setItem("isRoomCreator", false);
+        videoRef.current.srcObject = null;
+        socket.current.disconnect();
+        console.log("disconnected");
+      } else {
+        let localStream = videoRef.current.srcObject;
+        console.log(localStream);
+        console.log(rtcPeerConnection);
+        rtcPeerConnection.removeStream(localStream);
+        // rtcPeerConnection.close();
+        localStream.getTracks().forEach((track) => track.stop());
+        videoRef.current.srcObject = null;
+        const Name = name();
+        console.log(Name, id);
+        socket.current.emit("user_disconnected", { Name, id });
+        socket.current.disconnect();
+        console.log("disconnected");
+      }
     }
   };
 
