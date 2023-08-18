@@ -3,7 +3,7 @@ import {useParams} from "react-router-dom"
 import initializeSocket from '../services/socketconnection';
 import { setLocalStream,addLocalTracks ,setRemoteStream,sendIceCandidate,createOffer}from '../utils/StreamSetupjs';
 import { mediaConstraints ,iceServers} from '../utils/peersetup';
-import { isRoomCreator } from '../utils/sessionstorage';
+import { isRoomCreator,name } from '../utils/sessionstorage';
 import { Leftchatbar } from '../components/leftchatbar';
 function CreatorRoom() {
 
@@ -11,7 +11,7 @@ function CreatorRoom() {
   const videoRef = useRef(null);
   const socket = useRef(null); 
   const remoteVideoRef = useRef(null);
-
+  let rtcPeerConnection;
   const Connect = async () => {
     socket.current = initializeSocket().connect();
     socket.current.emit('join', id);
@@ -24,7 +24,7 @@ function CreatorRoom() {
     socket.current.on('start_call', async () => {
       console.log('Socket event callback: start_call')
       if (isRoomCreator()) {
-        const rtcPeerConnection = new RTCPeerConnection(iceServers);
+        rtcPeerConnection = new RTCPeerConnection(iceServers);
         const localStream=videoRef.current.srcObject;
     addLocalTracks(localStream,rtcPeerConnection);
         rtcPeerConnection.ontrack =(event)=>{
@@ -51,22 +51,28 @@ function CreatorRoom() {
             rtcPeerConnection.setRemoteDescription(new RTCSessionDescription(event));
         })
         console.log(rtcPeerConnection);
+
+        socket.current.on("user disconnected",(event)=>{
+          alert(event," diconnected");
+        })
       }
     })
   };
   const Disconnect = async() => {
     if (socket.current) {
       socket.current.disconnect();
-      socket.current = null;
-      videoRef.current.srcObject = null;
-      // await navigator.mediaDevices.getUserMedia({video:false,audio:false});
+      let localStream=videoRef.current.srcObject;
+      rtcPeerConnection.removeStream(localStream);
+      rtcPeerConnection.close();
+      localStream.getTracks().forEach((track) => track.stop())
     sessionStorage.setItem('isRoomCreator',false);
-    remoteVideoRef.current.srcObject = null;
+    videoRef.current.srcObject=null;
+      socket.current.emit("user disconnected",{name,id});
       console.log("disconnected");
-      
-    
     }
   };
+
+ 
 
   return (<>
     <Leftchatbar Id={id} />

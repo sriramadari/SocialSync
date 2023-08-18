@@ -56,6 +56,12 @@ io.on('connection', (socket) => {
 
 
   // These events are emitted to all the sockets connected to the same room except the sender.
+
+socket.on("user disconnected",(e)=>{
+  console.log("user diconnection broadcasted");
+  socket.broadcast.to(e.id).emit('user disconnected',e.name)
+})
+
   socket.on('start_call', (roomId) => {
     console.log(`Broadcasting start_call event to peers in room ${roomId}`)
     socket.broadcast.to(roomId).emit('start_call')
