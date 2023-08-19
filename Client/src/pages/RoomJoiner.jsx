@@ -17,6 +17,7 @@ function RoomJoiner() {
   const socket = useRef(null);
   const remoteVideoRef = useRef(null);
   let rtcPeerConnection;
+  const Name = name();
   const Connect = async () => {
     socket.current = initializeSocket().connect();
     socket.current.emit("join", id);
@@ -24,7 +25,7 @@ function RoomJoiner() {
       const stream = await setLocalStream(mediaConstraints);
       videoRef.current.srcObject = stream;
       sessionStorage.setItem("isRoomCreator", false);
-      socket.current.emit("start_call", id);
+      socket.current.emit("start_call", {Name,id});
     });
 
     socket.current.on("webrtc_offer", async (event) => {
@@ -86,7 +87,6 @@ function RoomJoiner() {
         // rtcPeerConnection.close();
         localStream.getTracks().forEach((track) => track.stop());
         videoRef.current.srcObject = null;
-        const Name = name();
         console.log(Name, id);
         socket.current.emit("user_disconnected", { Name, id });
         socket.current.disconnect();

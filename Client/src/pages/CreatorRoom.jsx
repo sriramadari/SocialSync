@@ -26,8 +26,9 @@ function CreatorRoom() {
       sessionStorage.setItem("isRoomCreator", true);
       console.log("room created with ID", id);
     });
-    socket.current.on("start_call", async () => {
+    socket.current.on("start_call", async (event) => {
       console.log("Socket event callback: start_call");
+      alert(event+" is calling !")
       if (isRoomCreator()) {
         rtcPeerConnection = new RTCPeerConnection(iceServers);
         const localStream = videoRef.current.srcObject;

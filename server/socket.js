@@ -10,27 +10,32 @@ const io = require('socket.io')(server,{
 
 
 // app.use('/', express.static('public'))
-const userSockets = {};
+const activeRooms = {};
 
 io.on('connection', (socket) => {
   console.log('A user connected with ID:',socket.id);
 
-    socket.on('set_user_id', (Id) => {
-      userSockets[Id] = socket;
+    socket.on('join_room', (Id) => {
+      socket.join(Id);
+      if(!activeRooms[Id]){
+        activeRooms[Id]=[];
+      }
+      activeRooms[Id].push(socket.id);
+      // io.to(Id).emit('user_joined')
+      console.log(activeRooms);
     });
 
-    socket.on('sending_message', ({ msg, Id }) => {
-      if (userSockets[Id]) {
-        userSockets[Id].emit('receiving_msg', { msg });
-      }
+    socket.on('send_msg', ({ msg, Id, Name }) => {
+      console.log({ msg, Id, Name });
+     io.emit('receive_msg', { msg, Id, Name });
     });
-    socket.on('disconnect', () => {
-      console.log('User disconnected:', socket.id);
-      const userId = Object.keys(userSockets).find(key => userSockets[key] === socket);
-      if (userId) {
-        delete userSockets[userId];
-      }
-    });
+    // socket.on('disconnect', () => {
+    //   console.log('User disconnected:', socket.id);
+    //   const userId = Object.keys(userSockets).find(key => userSockets[key] === socket);
+    //   if (userId) {
+    //     delete userSockets[userId];
+    //   }
+    // });
 
 
   socket.on('join', (roomId) => {
@@ -62,9 +67,9 @@ socket.on("user_disconnected",(e)=>{
   socket.broadcast.to(e.id).emit('user_disconnected',e.Name)
 })
 
-  socket.on('start_call', (roomId) => {
-    console.log(`Broadcasting start_call event to peers in room ${roomId}`)
-    socket.broadcast.to(roomId).emit('start_call')
+  socket.on('start_call', (event) => {
+    console.log(`Broadcasting start_call event to peers in room ${event.id}`);
+socket.broadcast.to(event.id).emit('start_call',event.Name)
   })
   socket.on('webrtc_offer', (event) => {
     console.log(`Broadcasting webrtc_offer event to peers in room ${event.roomId}`)
