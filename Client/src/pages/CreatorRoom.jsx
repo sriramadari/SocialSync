@@ -10,7 +10,7 @@ import {
 } from "../utils/StreamSetupjs";
 import { mediaConstraints, iceServers } from "../utils/peersetup";
 import { isRoomCreator, name } from "../utils/sessionstorage";
-import { Leftchatbar } from "../components/leftchatbar";
+import  Leftchatbar  from "../components/leftchatbar";
 function CreatorRoom() {
   const { id } = useParams();
   const videoRef = useRef(null);
@@ -76,6 +76,7 @@ function CreatorRoom() {
         localStream.getTracks().forEach((track) => track.stop());
         sessionStorage.setItem("isRoomCreator", false);
         videoRef.current.srcObject = null;
+        remoteVideoRef.current.srcObject = null;
         socket.current.disconnect();
         console.log("disconnected");
       }else{
@@ -88,6 +89,7 @@ function CreatorRoom() {
       videoRef.current.srcObject = null;
       const Name = name();
       console.log(name, id);
+      remoteVideoRef.current.srcObject = null;
       socket.current.emit("user_disconnected", { Name, id });
       socket.current.disconnect();
       console.log("disconnected");
@@ -96,9 +98,11 @@ function CreatorRoom() {
   };
 
   return (
-    <>
-      <Leftchatbar Id={id} />
-      <div className="flex flex-col items-center justify-center h-screen">
+<div className="flex flex-row  bg-gray-100">
+      <div className="m-auto w-1/4 bg-white rounded-lg shadow-lg">
+        <Leftchatbar Id={id} />
+      </div>
+      <div className="flex flex-col items-center justify-center w-3/4">
         <h1 className="text-2xl font-bold mb-4">Video Call Room</h1>
         <div className="flex flex-row items-center">
           <video
@@ -114,7 +118,6 @@ function CreatorRoom() {
             className="w-96 h-72 object-cover mb-4"
           />
         </div>
-
         <button
           onClick={Connect}
           className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
@@ -128,7 +131,7 @@ function CreatorRoom() {
           End Call
         </button>
       </div>
-    </>
+    </div>
   );
 }
 

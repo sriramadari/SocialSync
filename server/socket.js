@@ -8,27 +8,28 @@ const io = require('socket.io')(server,{
   }
 })
 
-
 // app.use('/', express.static('public'))
 const activeRooms = {};
 
 io.on('connection', (socket) => {
   console.log('A user connected with ID:',socket.id);
 
-    socket.on('join_room', (Id) => {
-      socket.join(Id);
-      if(!activeRooms[Id]){
-        activeRooms[Id]=[];
-      }
-      activeRooms[Id].push(socket.id);
-      // io.to(Id).emit('user_joined')
-      console.log(activeRooms);
-    });
+    // socket.on('join_room', (Id) => {
+    //   // socket.join(Id);
+    //   // if(!activeRooms[Id]){
+    //   //   activeRooms[Id]=[];
+    //   // }
+    //   // activeRooms[Id].push(socket.id);
+    //   // io.to(Id).emit('user_joined')
+    //   // console.log(activeRooms);
+     
+    // });
 
     socket.on('send_msg', ({ msg, Id, Name }) => {
       console.log({ msg, Id, Name });
-     io.emit('receive_msg', { msg, Id, Name });
+      socket.broadcast.emit('receive_msg', { msg, Id, Name });
     });
+   
     // socket.on('disconnect', () => {
     //   console.log('User disconnected:', socket.id);
     //   const userId = Object.keys(userSockets).find(key => userSockets[key] === socket);
@@ -49,13 +50,10 @@ io.on('connection', (socket) => {
       console.log(message);
       socket.join(roomId);
       socket.emit('room_created', roomId,message);
-    } else if (numberOfClients == 1) {
+    } else {
       console.log(`Joining room ${roomId} and emitting room_joined socket event`);
       socket.join(roomId);
       socket.emit('room_joined', roomId);
-    } else {
-      console.log(`Can't join room ${roomId}, emitting full_room socket event`);
-      socket.emit('full_room', roomId);
     }
   });
 

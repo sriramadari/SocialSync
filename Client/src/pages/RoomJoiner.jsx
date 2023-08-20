@@ -9,7 +9,7 @@ import {
   createAnswer,
 } from "../utils/StreamSetupjs";
 import { mediaConstraints, iceServers } from "../utils/peersetup";
-import { Leftchatbar } from "../components/leftchatbar";
+import Leftchatbar from "../components/leftchatbar";
 import { name } from "../utils/sessionstorage";
 function RoomJoiner() {
   const { id } = useParams();
