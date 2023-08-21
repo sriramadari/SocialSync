@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Message from './Message';
-import initializeSocket from '../services/socketconnection';
+import {ToChatSocket} from '../services/socketconnection';
 import { name } from '../utils/sessionstorage';
 
 const Leftchatbar = ({ Id }) => {
@@ -10,8 +10,8 @@ const Leftchatbar = ({ Id }) => {
   const socket=useRef();
 
   useEffect(() => {
-    socket.current = initializeSocket().connect();
-    // socket.current.emit('join_room', Id);
+    socket.current = ToChatSocket().connect();
+    socket.current.emit('join_room', Id);
 
     socket.current.on('receive_msg', (event) => {
       const receivedMessage = event.msg;
