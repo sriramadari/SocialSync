@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState
+  ,useRef } from "react";
 import { useParams } from "react-router-dom";
 import initializeSocket from "../services/socketconnection";
 import {
@@ -16,14 +17,20 @@ function CreatorRoom() {
   const videoRef = useRef(null);
   const socket = useRef(null);
   const remoteVideoRef = useRef(null);
+  const [isButtonClickable, setIsButtonClickable] = useState(false);
+  console.log(isButtonClickable);
   let rtcPeerConnection;
   const Connect = async () => {
     socket.current = initializeSocket().connect();
-    socket.current.emit("join", id);
+    sessionStorage.setItem("isRoomCreator", true);
+    const creator="True";
+    console.log("roomId & creator",id,creator);
+    let roomId=id;
+    socket.current.emit("join", {roomId,creator});
     socket.current.on("room_created", async (roomId) => {
       const stream = await setLocalStream(mediaConstraints);
       videoRef.current.srcObject = stream;
-      sessionStorage.setItem("isRoomCreator", true);
+      setIsButtonClickable(!isButtonClickable);
       console.log("room created with ID", id);
     });
     socket.current.on("start_call", async (event) => {
@@ -63,7 +70,7 @@ function CreatorRoom() {
         console.log(rtcPeerConnection);
 
         socket.current.on("user_disconnected", (event) => {
-          alert(event + " disconnected");
+          alert(event.Name + " disconnected");
           remoteVideoRef.current.srcObject = null;
         });
       }
@@ -71,12 +78,15 @@ function CreatorRoom() {
   };
   const Disconnect = async () => {
     if (socket.current) {
+      setIsButtonClickable(!isButtonClickable);
       if (rtcPeerConnection == null) {
         let localStream = videoRef.current.srcObject;
         localStream.getTracks().forEach((track) => track.stop());
         sessionStorage.setItem("isRoomCreator", false);
         videoRef.current.srcObject = null;
         remoteVideoRef.current.srcObject = null;
+        const Name = name();
+        socket.current.emit("user_disconnected", { Name, id });
         socket.current.disconnect();
         console.log("disconnected");
       }else{
@@ -88,7 +98,7 @@ function CreatorRoom() {
       sessionStorage.setItem("isRoomCreator", false);
       videoRef.current.srcObject = null;
       const Name = name();
-      console.log(name, id);
+      console.log(Name, id);
       remoteVideoRef.current.srcObject = null;
       socket.current.emit("user_disconnected", { Name, id });
       socket.current.disconnect();
@@ -97,41 +107,51 @@ function CreatorRoom() {
   }
   };
 
+  useEffect(()=>{
+    Disconnect();
+    return()=>{
+    Disconnect();
+    }
+  },[]);
+
   return (
-<div className="flex flex-row  bg-gray-100">
-      <div className="m-auto w-1/4 bg-white rounded-lg shadow-lg">
-        <Leftchatbar Id={id} />
-      </div>
-      <div className="flex flex-col items-center justify-center w-3/4">
-        <h1 className="text-2xl font-bold mb-4">Video Call Room</h1>
-        <div className="flex flex-row items-center">
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            className="w-96 h-72 object-cover mb-4"
-          />
-          <video
-            ref={remoteVideoRef}
-            autoPlay
-            playsInline
-            className="w-96 h-72 object-cover mb-4"
-          />
-        </div>
-        <button
-          onClick={Connect}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
-        >
-          Start Call
-        </button>
-        <button
-          onClick={Disconnect}
-          className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300 mt-2"
-        >
-          End Call
-        </button>
-      </div>
+<div className="flex flex-row bg-gray-100 h-screen">
+  <div className="w-1/4 bg-white rounded-lg shadow-lg h-full">
+    <Leftchatbar Id={id} />
+  </div>
+  <div className="flex flex-col items-center justify-center w-3/4 h-full">
+    <h1 className="text-2xl font-bold mb-4">Video Call Room</h1>
+    <div className="flex flex-row items-center">
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        className="w-96 h-72 object-cover mb-4"
+      />
+      <video
+        ref={remoteVideoRef}
+        autoPlay
+        playsInline
+        className="w-96 h-72 object-cover mb-4"
+      />
     </div>
+    <button
+      onClick={Connect}
+      disabled={isButtonClickable}
+      className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
+    >
+      Start Call
+    </button>
+    <button
+      onClick={Disconnect}
+      disabled={!isButtonClickable}
+      className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300 mt-2"
+    >
+      End Call
+    </button>
+  </div>
+</div>
+
   );
 }
 

@@ -35,7 +35,7 @@ chatSocket.on('connection',(socket)=>{
     });
     socket.on('disconnect', () => {
 
-      console.log('user with ID ',socket.id,' disconnected:', );
+      console.log('user from chat with socket ID ',socket.id,' disconnected:', );
       for (const roomId in activeRooms) {
         const index = activeRooms[roomId].indexOf(socket.id);
         if (index !== -1) {
@@ -58,15 +58,21 @@ videosocket.on('connection', (socket) => {
   
 console.log('A user video with ID:',socket.id);
 
-  socket.on('join', (roomId) => {
-  
+  socket.on('join', ({roomId,creator}) => {
+    console.log("roomId & creator ",roomId,creator,"joined");
+    console.log(typeof(creator));
     if (!numberOfClients[roomId]) {
-      numberOfClients[roomId]=[];
-      numberOfClients[roomId].push(socket.id);
-      console.log(numberOfClients);
-      const message=`Creating room ${roomId} and emitting room_created socket event`;
-      socket.join(roomId);
-      socket.emit('room_created', roomId,message);
+      if(creator=="False"){
+        console.log("creator is not online");
+        socket.emit("offline");
+      }else{
+        numberOfClients[roomId]=[];
+        numberOfClients[roomId].push(socket.id);
+        console.log(numberOfClients);
+        const message=`Creating room ${roomId} and emitting room_created socket event`;
+        socket.join(roomId);
+        socket.emit('room_created', roomId,message);
+      }
     } else if(numberOfClients[roomId].length==1){
       numberOfClients[roomId].push(socket.id);
       console.log(`Joining room ${roomId} and emitting room_joined socket event`);
@@ -89,7 +95,7 @@ socket.on("user_disconnected",(e)=>{
       numberOfClients[roomId].splice(index, 1);
       console.log(`Client disconnected from room ${roomId}. ${numberOfClients[roomId].length} clients remaining.`);
       if (numberOfClients[roomId].length === 1) {
-        videosocket.to(roomId).emit('user_disconnected', roomId);
+        videosocket.to(roomId).emit('user_disconnected', e);
       } else if (numberOfClients[roomId].length === 0) {
         delete numberOfClients[roomId];
         console.log(`Room ${roomId} has no clients, deleting`); 
@@ -119,7 +125,22 @@ socket.broadcast.to(event.id).emit('start_call',event.Name)
   })
   socket.on('disconnect', () => {
 
-    console.log('user with ID ',socket.id,' disconnected:', );
+    console.log('user with  ID ',socket.id,' disconnected from video call:', );
+    for (const roomId in numberOfClients) {
+      const index = numberOfClients[roomId].indexOf(socket.id);
+      if (index !== -1) {
+        numberOfClients[roomId].splice(index, 1);
+        console.log(`Client disconnected from room ${roomId}. ${numberOfClients[roomId].length} clients remaining.`);
+        if (numberOfClients[roomId].length === 1) {
+          // videosocket.to(roomId).emit('user_disconnected');
+          console.log("user disconnected");
+        } else if (numberOfClients[roomId].length === 0) {
+          delete numberOfClients[roomId];
+          console.log(`Room ${roomId} has no clients, deleting`); 
+        }
+        break; 
+      }
+    }
   });
 })
 

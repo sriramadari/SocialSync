@@ -44,7 +44,7 @@ const Leftchatbar = ({ Id }) => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-grow overflow-y-auto px-4 py-2">
+      <div className="flex-grow overflow-x-auto px-4 py-2">
         {messages.map((message, index) => (
           <Message
             key={index}

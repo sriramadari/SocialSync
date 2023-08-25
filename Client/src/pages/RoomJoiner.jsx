@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import initializeSocket from "../services/socketconnection";
 import {
@@ -10,7 +10,7 @@ import {
 } from "../utils/StreamSetupjs";
 import { mediaConstraints, iceServers } from "../utils/peersetup";
 import Leftchatbar from "../components/leftchatbar";
-import { name } from "../utils/sessionstorage";
+import { name,isRoomCreator } from "../utils/sessionstorage";
 function RoomJoiner() {
   const { id } = useParams();
   const videoRef = useRef(null);
@@ -18,13 +18,23 @@ function RoomJoiner() {
   const remoteVideoRef = useRef(null);
   let rtcPeerConnection;
   const Name = name();
+  const [isButtonClickable, setIsButtonClickable] = useState(false);
+
+ 
+
   const Connect = async () => {
     socket.current = initializeSocket().connect();
-    socket.current.emit("join", id);
+    sessionStorage.setItem("isRoomCreator", false);
+    const creator="False";
+    let roomId=id;
+    socket.current.emit("join", {roomId,creator});
+    socket.current.on("offline",()=>{
+      alert("Room Creator is Offline,wait until for connection !");
+    })
     socket.current.on("room_joined", async (roomId) => {
       const stream = await setLocalStream(mediaConstraints);
       videoRef.current.srcObject = stream;
-      sessionStorage.setItem("isRoomCreator", false);
+      setIsButtonClickable(!isButtonClickable);
       socket.current.emit("start_call", {Name,id});
     });
 
@@ -59,7 +69,7 @@ function RoomJoiner() {
       console.log(rtcPeerConnection);
       //   }
       socket.current.on("user_disconnected", (event) => {
-        alert(event + " disconnected");
+        alert(event.Name + " disconnected");
         remoteVideoRef.current.srcObject = null;
       });
     });
@@ -73,13 +83,17 @@ function RoomJoiner() {
   const Disconnect = async () => {
     if (socket.current) {
       if (rtcPeerConnection == null) {
+        setIsButtonClickable(!isButtonClickable);
         let localStream = videoRef.current.srcObject;
         localStream.getTracks().forEach((track) => track.stop());
         sessionStorage.setItem("isRoomCreator", false);
         videoRef.current.srcObject = null;
+        remoteVideoRef.current.srcObject = null;
+        socket.current.emit("user_disconnected", { Name, id });
         socket.current.disconnect();
         console.log("disconnected");
       } else {
+        setIsButtonClickable(!isButtonClickable);
         let localStream = videoRef.current.srcObject;
         console.log(localStream);
         console.log(rtcPeerConnection);
@@ -89,11 +103,14 @@ function RoomJoiner() {
         videoRef.current.srcObject = null;
         console.log(Name, id);
         socket.current.emit("user_disconnected", { Name, id });
+        remoteVideoRef.current.srcObject = null;
         socket.current.disconnect();
         console.log("disconnected");
       }
     }
   };
+
+ 
 
   return (
     <>
@@ -117,12 +134,14 @@ function RoomJoiner() {
 
         <button
           onClick={Connect}
+          disabled={isButtonClickable}
           className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
         >
           Start Connect
         </button>
         <button
           onClick={Disconnect}
+          disabled={!isButtonClickable}
           className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300 mt-2"
         >
           Disconnect
