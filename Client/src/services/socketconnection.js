@@ -1,11 +1,11 @@
 import { io } from 'socket.io-client';
 
 const initializeSocket = () => {
-  return io("http://localhost:8080/video"); 
+  return io("https://socialsync-eeuc.onrender.com/video"); 
 };
 
 export const ToChatSocket=()=>{
-  return io("http://localhost:8080/chat"); 
+  return io("https://socialsync-eeuc.onrender.com/chat"); 
 }
 
 export default initializeSocket;
