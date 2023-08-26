@@ -7,7 +7,7 @@ import Roomoutlet from './pages/roomoutlet';
 import {auth} from "./services/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import CreatorRoom from "./pages/CreatorRoom";
-import { Room } from './pages/Room';
+import { Room } from './pages/room';
 import { Joinroom } from './components/joinroom';
 import JoinOutlet from './pages/joinoutlet';
 import RoomJoiner from './pages/RoomJoiner';
