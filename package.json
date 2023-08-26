@@ -1,0 +1,12 @@
+{
+  "name": "socialsync",
+  "version": "1.0.0",
+  "description": "Project on webSocket and WebRtc",
+  "main": "./server/socket.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "cd ./server && node socket.js"
+  },
+  "author": "sriramadari",
+  "license": "ISC"
+}
