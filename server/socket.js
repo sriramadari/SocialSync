@@ -144,10 +144,10 @@ socket.broadcast.to(event.id).emit('start_call',event.Name)
   });
 })
 
-app.use(express.static(path.join(__dirname,"./client/dist")));
+app.use(express.static(path.join(__dirname,"./Client/dist")));
 
 app.get('*',cors(), (req, res) => {
-  res.sendFile(path.join(__dirname,"./client/dist/index.html"));
+  res.sendFile(path.join(__dirname,"./Client/dist/index.html"));
 });
 
 const port = process.env.PORT || 8080
