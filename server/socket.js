@@ -7,6 +7,7 @@ const io = require('socket.io')(server,{
   }
 })
 const path = require('path');
+const cors = require('cors');
 // const redisAdapter = require('socket.io-redis');
 
 // io.adapter(redisAdapter({ host: 'localhost', port: 6379 }));
