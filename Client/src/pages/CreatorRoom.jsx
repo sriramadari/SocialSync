@@ -43,6 +43,7 @@ function CreatorRoom() {
         rtcPeerConnection.ontrack = (event) => {
           setRemoteStream(event, remoteVideoRef);
         };
+        console.log("1:",rtcPeerConnection);
         rtcPeerConnection.onicecandidate = (event) => {
           sendIceCandidate(socket, id, event);
         };

@@ -16,6 +16,7 @@ export async function addLocalTracks(localStream,rtcPeerConnection) {
 }
 
 export function setRemoteStream(event, remoteVideoRef) {
+  console.log(event);
   remoteVideoRef.current.srcObject = event.streams[0];
 }
 
