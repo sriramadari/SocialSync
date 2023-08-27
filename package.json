@@ -8,5 +8,8 @@
     "start": "cd ./server && node socket.js"
   },
   "author": "sriramadari",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "path": "^0.12.7"
+  }
 }
