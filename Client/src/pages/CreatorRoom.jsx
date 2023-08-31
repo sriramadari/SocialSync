@@ -1,6 +1,6 @@
 import React, { useEffect, useState
-  ,useRef } from "react";
-import { useParams } from "react-router-dom";
+  ,useRef} from "react";
+import { useParams,Link} from "react-router-dom";
 import initializeSocket from "../services/socketconnection";
 import {
   setLocalStream,
@@ -117,9 +117,7 @@ function CreatorRoom() {
 
   return (
 <div className="flex flex-row bg-gray-100 h-screen">
-  <div className="w-1/4 bg-white rounded-lg shadow-lg h-full">
-    <Leftchatbar Id={id} />
-  </div>
+<Link to="/room">back</Link>
   <div className="flex flex-col items-center justify-center w-3/4 h-full">
     <h1 className="text-2xl font-bold mb-4">Video Call Room</h1>
     <div className="flex flex-row items-center">
@@ -151,8 +149,10 @@ function CreatorRoom() {
       End Call
     </button>
   </div>
+  <div className="w-1/4 bg-white rounded-lg shadow-lg h-full">
+    <Leftchatbar Id={id} />
+  </div>
 </div>
-
   );
 }
 

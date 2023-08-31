@@ -2,6 +2,7 @@ import React, { useEffect, useState,useRef } from "react";
 import { db } from "../services/firebase";
 import { ref, child, get } from "firebase/database";
 import {uid} from "../utils/sessionstorage";
+import { Link } from "react-router-dom";
 export const Header = () => {
     const dbRef = useRef(ref(db));
   const [name, setName] = useState("");
@@ -23,5 +24,8 @@ export const Header = () => {
     fetchData();
   }, []);
 
-  return <header>Hello,{name}</header>;
+  return <> 
+  <Link to="/">back</Link>
+  <header>Hello,{name}</header>
+  </>;
 };

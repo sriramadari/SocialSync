@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams,Link } from "react-router-dom";
 import initializeSocket from "../services/socketconnection";
 import {
   setLocalStream,
@@ -115,7 +115,8 @@ function RoomJoiner() {
 
   return (
     <>
-      <Leftchatbar Id={id} />
+    <Link to="/joinroom">back</Link>
+    <Leftchatbar Id={id} />
       <div className="flex flex-col items-center justify-center h-screen">
         <h1 className="text-2xl font-bold mb-4">Video Call Room</h1>
         <div className="flex flex-row items-center">
@@ -148,6 +149,7 @@ function RoomJoiner() {
           Disconnect
         </button>
       </div>
+      
     </>
   );
 }
