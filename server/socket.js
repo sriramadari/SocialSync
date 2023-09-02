@@ -114,7 +114,7 @@ socket.broadcast.to(event.id).emit('start_call',event.Name)
   })
   socket.on('webrtc_offer', (event) => {
     console.log(`Broadcasting webrtc_offer event to peers in room ${event.roomId}`)
-    socket.broadcast.to(event.roomId).emit('webrtc_offer', event.sdp)
+    socket.broadcast.to(event.roomId).emit('webrtc_offer', event)
   })
   socket.on('webrtc_answer', (event) => {
     console.log(`Broadcasting webrtc_answer event to peers in room ${event.roomId}`)

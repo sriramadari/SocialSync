@@ -16,8 +16,10 @@ function CreatorRoom() {
   const { id } = useParams();
   const videoRef = useRef(null);
   const socket = useRef(null);
+  const [RemoteName,setRemotename]=useState("");
   const remoteVideoRef = useRef(null);
   const [isButtonClickable, setIsButtonClickable] = useState(false);
+  const Name = name();
   console.log(isButtonClickable);
   let rtcPeerConnection;
   const Connect = async () => {
@@ -36,6 +38,7 @@ function CreatorRoom() {
     socket.current.on("start_call", async (event) => {
       console.log("Socket event callback: start_call");
       alert(event+" is calling !")
+      setRemotename(event);
       if (isRoomCreator()) {
         rtcPeerConnection = new RTCPeerConnection(iceServers);
         const localStream = videoRef.current.srcObject;
@@ -53,6 +56,7 @@ function CreatorRoom() {
           type: "webrtc_offer",
           sdp: sdp,
           roomId: id,
+          Name
         });
         socket.current.on("webrtc_ice_candidate", (event) => {
           console.log("Socket event callback: webrtc_ice_candidate");
@@ -80,6 +84,7 @@ function CreatorRoom() {
   const Disconnect = async () => {
     if (socket.current) {
       setIsButtonClickable(!isButtonClickable);
+      setRemotename("");
       if (rtcPeerConnection == null) {
         let localStream = videoRef.current.srcObject;
         localStream.getTracks().forEach((track) => track.stop());
@@ -116,43 +121,51 @@ function CreatorRoom() {
   },[]);
 
   return (
-<div className="flex flex-row bg-gray-100 h-screen">
-<Link to="/room">back</Link>
-  <div className="flex flex-col items-center justify-center w-3/4 h-full">
-    <h1 className="text-2xl font-bold mb-4">Video Call Room</h1>
-    <div className="flex flex-row items-center">
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        className="w-96 h-72 object-cover mb-4"
-      />
-      <video
-        ref={remoteVideoRef}
-        autoPlay
-        playsInline
-        className="w-96 h-72 object-cover mb-4"
-      />
+<div className="flex flex-row h-screen">
+  <div className="p-4 w-2/3 text-white flex flex-col justify-between bg-gray-500">
+      <Link to="/room" className="text-black hover:text-gray-200">Back</Link>
+      <h1 className="flex flex-row items-center justify-center text-3xl font-semibold my-4">Video Call Room</h1>
+      <div className="mb-4 md:flex md:flex-col  items-center justify-center md:justify-between">
+        <div className={`w-full mb-2 md:w-1/2 ${window.innerWidth < 768 ? 'md:w-full' : ''}`}>
+        <p className={`text-sm ${window.innerWidth < 768 ? 'text-center' : 'text-left'}`}>{RemoteName}</p>
+          <video
+            ref={remoteVideoRef}
+            autoPlay
+            playsInline
+            className={`w-full h-72 object-cover rounded-lg ${window.innerWidth < 768 ? 'mb-4' : ''}`}
+          />
+        </div>
+        <div className={`mb-18 flex flex-row items-center w-full md:w-1/2 md:ml-4 ${window.innerWidth < 768 ? 'mt-4' : ''}`}>
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            className={`items-center h-40 object-cover rounded-lg ${window.innerWidth < 768 ? '' : 'mb-4'}`}
+          />
+        </div>
     </div>
-    <button
-      onClick={Connect}
-      disabled={isButtonClickable}
-      className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
-    >
-      Start Call
-    </button>
-    <button
-      onClick={Disconnect}
-      disabled={!isButtonClickable}
-      className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300 mt-2"
-    >
-      End Call
-    </button>
+    <div className="flex flex-row items-center justify-center">
+      <button
+        onClick={Connect}
+        disabled={isButtonClickable}
+        className="py-2 px-4 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300 mr-4"
+      >
+        Start Call
+      </button>
+      <button
+        onClick={Disconnect}
+        disabled={!isButtonClickable}
+        className="py-2 px-4 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300"
+      >
+        End Call
+      </button>
+    </div>
   </div>
-  <div className="w-1/4 bg-white rounded-lg shadow-lg h-full">
+  <div className="w-1/3 bg-gray-100 p-4">
     <Leftchatbar Id={id} />
   </div>
 </div>
+
   );
 }
 

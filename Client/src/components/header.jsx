@@ -24,8 +24,11 @@ export const Header = () => {
     fetchData();
   }, []);
 
-  return <> 
-  <Link to="/">back</Link>
-  <header>Hello,{name}</header>
-  </>;
+  return <div className="flex flex-row items-start p-4 bg-blue-500">
+  <Link to="/" className="text-black hover:text-blue-700 mt-2">Back</Link>
+  <div className="flex-grow flex items-center justify-center">
+    <header className="text-3xl font-semibold text-center">Hello, {name}</header>
+  </div>
+</div>
+
 };

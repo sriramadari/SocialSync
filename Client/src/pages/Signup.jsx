@@ -45,60 +45,63 @@ function writeUserData(userId,name, email) {
     console.error("Error saving user data:", error);
 })}
   return (
-    <div className="w-full max-w-xs mx-auto">
-    <h2 className="text-2xl font-semibold mb-4">Sign Up</h2>
-    <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={handleSignup}>
-      <div className="mb-4">
-        <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
-          Name:
-        </label>
-        <input
-          type="text"
-          placeholder="name"
-          name="name"
-          value={field.name || ""}
-          onChange={handlefields}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        />
-      </div>
-      <div className="mb-4">
-        <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
-          Email:
-        </label>
-        <input
-          type="email"
-          placeholder="email"
-          name="email"
-          value={field.email || ""}
-          onChange={handlefields}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        />
-      </div>
-      <div className="mb-6">
-        <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
-          Password:
-        </label>
-        <input
-          type="password"
-          placeholder="Password"
-          name="password"
-          value={field.password || ""}
-          onChange={handlefields}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        />
-      </div>
-      <div className="flex items-center justify-between">
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        >
-          Sign Up
-        </button>
-      </div>
-    </form>
-    <p className="text-center text-gray-500 text-sm">
-      Already have an account? <Link to="/login" className="text-blue-500 hover:text-blue-800">Log In</Link>
-    </p>
-  </div>  
+    <div className="flex flex-col items-center justify-center h-screen">
+          <h2 className=" flex items-center text-2xl justify-center font-semibold mb-4">Sign Up</h2>
+    <div className="max-w-lg mx-auto">
+      <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={handleSignup}>
+        <div className="mb-4">
+          <label htmlFor="name" className="block font-medium">
+            Name:
+          </label>
+          <input
+            type="text"
+            placeholder="Name"
+            name="name"
+            value={field.name || ""}
+            onChange={handlefields}
+            className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="email" className="block font-medium">
+            Email:
+          </label>
+          <input
+            type="email"
+            placeholder="Email"
+            name="email"
+            value={field.email || ""}
+            onChange={handlefields}
+            className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
+          />
+        </div>
+        <div className="mb-6">
+          <label htmlFor="password" className="block font-medium">
+            Password:
+          </label>
+          <input
+            type="password"
+            placeholder="Password"
+            name="password"
+            value={field.password || ""}
+            onChange={handlefields}
+            className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
+          />
+        </div>
+        <div>
+          <button
+            type="submit"
+            className="w-full py-2 px-3 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
+          >
+            Sign Up
+          </button>
+        </div>
+      </form>
+      <p className="text-center text-gray-500 text-sm">
+        Already have an account? <Link to="/login" className="text-blue-500 hover:text-blue-800">Log In</Link>
+      </p>
+    </div>
+  </div>
+  
   )
 }
