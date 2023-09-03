@@ -24,8 +24,12 @@ The **Social Sync Application** is a real-time communication platform that allow
 2. **Install the project dependencies**:
 
    ```bash
+   cd Client && npm install
+   npm run dev
+   cd ..
+   cd server
    npm install
-   npm start
+   node socket.js
 
 ## Open your web browser and navigate to http://localhost:3000 to use the application.
 
