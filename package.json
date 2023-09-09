@@ -10,6 +10,7 @@
   "author": "sriramadari",
   "license": "ISC",
   "dependencies": {
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "quill-cursors": "^4.0.2"
   }
 }
