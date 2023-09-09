@@ -164,11 +164,11 @@ socket.broadcast.to(event.id).emit('start_call',event.Name)
   });
 })
 
-// app.use(express.static(path.join(__dirname,"../Client/dist")));
+app.use(express.static(path.join(__dirname,"../Client/dist")));
 
-// app.get('*',cors(), (req, res) => {
-//   res.sendFile(path.join(__dirname,"../Client/dist/index.html"));
-// });
+app.get('*',cors(), (req, res) => {
+  res.sendFile(path.join(__dirname,"../Client/dist/index.html"));
+});
 app.get("/",(req,res)=>{
   res.send("Hello World");
 })
