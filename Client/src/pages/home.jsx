@@ -18,7 +18,7 @@ function Home() {
   }
 
   return (
-    <div className="flex h-screen justify-center items-center bg-blue-500">
+    <div className="flex h-screen justify-center items-center bg-gray-600">
       <div className="text-center">
         <h1 className="text-7xl font-bold text-white mb-10 -mt-20">SocialSync</h1>
         <ul className="list-none flex flex-col items-center">

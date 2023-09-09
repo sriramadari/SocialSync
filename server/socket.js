@@ -7,7 +7,7 @@ const io = require('socket.io')(server,{
   }
 })
 const path = require('path');
-const cors = require('cors');
+// const cors = require('cors');
 // const redisAdapter = require('socket.io-redis');
 
 // io.adapter(redisAdapter({ host: 'localhost', port: 6379 }));
@@ -15,6 +15,7 @@ const cors = require('cors');
 // app.use('/', express.static('public'))
 const chatSocket=io.of("/chat");
 const videosocket=io.of("/video");
+const Editor=io.of("/Editor");
 const activeRooms = {};
 
 chatSocket.on('connection',(socket)=>{
@@ -53,6 +54,24 @@ chatSocket.on('connection',(socket)=>{
       }
     });
 })
+
+Editor.on('connection', (socket) => {
+  console.log('A user connected to the "editor" namespace');
+
+  socket.on('editor-change', (content) => { 
+    Editor.emit('editor-change', content);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected from the "editor" namespace');
+  });
+});
+
+
+
+
+
+
 
 const numberOfClients={};
 videosocket.on('connection', (socket) => {
@@ -145,13 +164,18 @@ socket.broadcast.to(event.id).emit('start_call',event.Name)
   });
 })
 
-app.use(express.static(path.join(__dirname,"../Client/dist")));
+// app.use(express.static(path.join(__dirname,"../Client/dist")));
 
-app.get('*',cors(), (req, res) => {
-  res.sendFile(path.join(__dirname,"../Client/dist/index.html"));
-});
+// app.get('*',cors(), (req, res) => {
+//   res.sendFile(path.join(__dirname,"../Client/dist/index.html"));
+// });
+app.get("/",(req,res)=>{
+  res.send("Hello World");
+})
 
 const port = process.env.PORT || 8080
 server.listen(port, () => {
   console.log(`Express server listening on port ${port}`)
+  console.log(this);
 })
+

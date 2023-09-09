@@ -12,6 +12,7 @@ import {
 import { mediaConstraints, iceServers } from "../utils/peersetup";
 import { isRoomCreator, name } from "../utils/sessionstorage";
 import  Leftchatbar  from "../components/leftchatbar";
+import Editor from "../components/Editor";
 function CreatorRoom() {
   const { id } = useParams();
   const videoRef = useRef(null);
@@ -20,7 +21,12 @@ function CreatorRoom() {
   const remoteVideoRef = useRef(null);
   const [isButtonClickable, setIsButtonClickable] = useState(false);
   const Name = name();
-  console.log(isButtonClickable);
+  // console.log(isButtonClickable);
+  // const [RemoteName, setRemotename] = useState("");
+  const [useEditor,SetEditor]=useState(true);
+  const handleToggle=()=>{
+   SetEditor(!useEditor)
+  }
   let rtcPeerConnection;
   const Connect = async () => {
     socket.current = initializeSocket().connect();
@@ -162,7 +168,8 @@ function CreatorRoom() {
     </div>
   </div>
   <div className="w-1/3 bg-gray-100 p-4">
-    <Leftchatbar Id={id} />
+  <button onClick={handleToggle}>Editor</button>
+  {useEditor?<Editor/>:<Leftchatbar Id={id} />}
   </div>
 </div>
 

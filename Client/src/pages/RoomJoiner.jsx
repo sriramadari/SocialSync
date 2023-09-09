@@ -11,16 +11,20 @@ import {
 import { mediaConstraints, iceServers } from "../utils/peersetup";
 import Leftchatbar from "../components/leftchatbar";
 import { name,isRoomCreator } from "../utils/sessionstorage";
+import Editor from "../components/Editor";
 function RoomJoiner() {
   const { id } = useParams();
   const videoRef = useRef(null);
   const socket = useRef(null);
   const remoteVideoRef = useRef(null);
   let rtcPeerConnection;
+  const [useEditor,SetEditor]=useState(true);
   const Name = name();
   const [isButtonClickable, setIsButtonClickable] = useState(false);
   const [RemoteName, setRemotename] = useState("");
- 
+ const handleToggle=()=>{
+  SetEditor(!useEditor)
+ }
 
   const Connect = async () => {
     socket.current = initializeSocket().connect();
@@ -156,8 +160,9 @@ function RoomJoiner() {
         </button>
       </div>
     </div>
-    <div className="w-1/3 bg-gray-100 p-4">
-      <Leftchatbar Id={id} />
+    <div className="w-2/3 bg-gray-100 p-4">
+    <button onClick={handleToggle}>Editor</button>
+    {useEditor?<Editor/>:<Leftchatbar Id={id} />}
     </div>
   </div>
   );
