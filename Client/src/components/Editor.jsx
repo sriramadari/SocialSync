@@ -1,88 +1,95 @@
-import React, { useEffect, useState, useRef } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import QuillCursors from 'quill-cursors'; // Import the quill-cursors library
-import { EditerSocket } from '../services/socketconnection';
-import Quill from 'quill';
-Quill.register('modules/cursors', QuillCursors); // Register the module
+import { useCallback, useEffect, useState,useRef } from "react"
+import Quill from "quill"
+import "quill/dist/quill.snow.css"
+import { EditerSocket } from "../services/socketconnection"
 
-const Editor = () => {
-  const [fileContent, setFileContent] = useState(''); // Store text file content
-  const [quillContent, setQuillContent] = useState(''); // Store Quill editor content
-  const socket = useRef(null);
-  const quillRef = useRef(null); // Reference to the Quill editor instance
-  
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    console.log(file); 
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        
-        console.log(event.target.result)
-        setFileContent(event.target.result);
-        setQuillContent(event.target.result);
-        socket.current.emit('editor-change', event.target.result);
+const SAVE_INTERVAL_MS = 2000;
+const TOOLBAR_OPTIONS = [
+  [{ header: [1, 2, 3, 4, 5, 6, false] }],
+  [{ font: [] }],
+  [{ list: "ordered" }, { list: "bullet" }],
+  ["bold", "italic", "underline"],
+  [{ color: [] }, { background: [] }],
+  [{ script: "sub" }, { script: "super" }],
+  [{ align: [] }],
+  ["image", "blockquote", "code-block"],
+  ["clean"],
+]
 
-      };
-      reader.readAsText(file);
-    }
-  };
-
-  const handleContentChange = (content) => {
-    setQuillContent(content);
-    socket.current.emit('editor-change', content);
-  };
+export default function TextEditor({Id}) {
+  const socket=useRef();
+  const [quill, setQuill] = useState()
 
   useEffect(() => {
     socket.current = EditerSocket().connect();
-    socket.current.on('editor-change', (content) => {
-      setQuillContent(content);
-      quillRef.current.setContents(content);
-    });
+    return () => {
+      socket.current.disconnect()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (socket.current == null || quill == null) return
+
+    socket.current.on("load-document", document => {
+      quill.setContents(document)
+      quill.enable()
+    })
+
+    socket.current.emit("get-document", Id)
+  }, [socket.current, quill, Id])
+
+  useEffect(() => {
+    if (socket.current == null || quill == null) return
+
+    const interval = setInterval(() => {
+      socket.current.emit("save-document", quill.getContents())
+    }, SAVE_INTERVAL_MS)
 
     return () => {
-      socket.current.disconnect();
-    };
-  }, [socket]);
+      clearInterval(interval)
+    }
+  }, [socket.current, quill])
 
-//   useEffect(() => {
-//     if (quillRef.current) {
-//         quillRef.current.setContents(content); // Enable cursor synchronization
-//     }
-//   }, [quillRef]);
-// useEffect(() => {
-//     socket.current = EditerSocket().connect();
+  useEffect(() => {
+    if (socket.current == null || quill == null) return
 
-//     // Listen for changes from other users and update the Quill editor
-//     socket.current.on('editor-change', (content) => {
-//       if (quillRef.current) {
-//         // Check if quillRef.current is defined before using getModule
-//         quillRef.current.setContents(content); // Use setContents to update the Quill editor
-//       }
-//     });
+    const handler = delta => {
+      quill.updateContents(delta)
+    }
+    socket.current.on("receive-changes", handler)
 
-//     return () => {
-//       socket.current.disconnect();
-//     };
-//   }, [socket]);
+    return () => {
+      socket.current.off("receive-changes", handler)
+    }
+  }, [socket.current, quill])
 
-  return (
-    <div>
-      <input type="file" accept=".txt" onChange={handleFileUpload} />
-      <ReactQuill
-        ref={quillRef}
-        value={quillContent}
-        onChange={handleContentChange}
-        theme="snow"
-        modules={{
-          cursors: true, // Enable cursors module
-        }}
-      />
-    </div>
-  );
-};
+  useEffect(() => {
+    if (socket.current == null || quill == null) return
 
-export default Editor;
+    const handler = (delta, oldDelta, source) => {
+      if (source !== "user") return
+      socket.current.emit("send-changes", delta)
+    }
+    quill.on("text-change", handler)
 
+    return () => {
+      quill.off("text-change", handler)
+    }
+  }, [socket.current, quill])
 
+  const wrapperRef = useCallback(wrapper => {
+    if (wrapper == null) return
+
+    wrapper.innerHTML = ""
+    const editor = document.createElement("div")
+    wrapper.append(editor)
+    const q=new Quill(editor, {
+      theme: "snow",
+      modules: { toolbar: TOOLBAR_OPTIONS },
+    })
+    q.disable()
+    q.setText("Loading...")
+    setQuill(q)
+  }, [])
+  return <div className="container" ref={wrapperRef}></div>
+}

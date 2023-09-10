@@ -162,7 +162,7 @@ function RoomJoiner() {
     </div>
     <div className="w-2/3 bg-gray-100 p-4">
     <button onClick={handleToggle}>Editor</button>
-    {useEditor?<Editor/>:<Leftchatbar Id={id} />}
+    {useEditor?<Editor Id={id}/>:<Leftchatbar Id={id} />}
     </div>
   </div>
   );

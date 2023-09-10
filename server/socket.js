@@ -1,4 +1,5 @@
 const express = require('express')
+const mongoose =require("mongoose")
 const app = express()
 const server = require('http').createServer(app)
 const io = require('socket.io')(server,{
@@ -8,6 +9,20 @@ const io = require('socket.io')(server,{
 })
 const path = require('path');
 const cors = require('cors');
+const Document = require("./document")
+// mongodb://127.0.0.1:27017
+// mongodb+srv://lakshmisriramadari1427:Y5Dj4RGxxXzXM10D@cluster0.tkco0ga.mongodb.net
+mongoose.connect('mongodb+srv://lakshmisriramadari1427:Y5Dj4RGxxXzXM10D@cluster0.tkco0ga.mongodb.net/SocialSync', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(()=>{
+  console.log("connected To MongoDb")
+}).catch((error)=>{
+  console.log(error)
+})
+
+
+const defaultValue = ""
 // const redisAdapter = require('socket.io-redis');
 
 // io.adapter(redisAdapter({ host: 'localhost', port: 6379 }));
@@ -55,23 +70,42 @@ chatSocket.on('connection',(socket)=>{
     });
 })
 
-Editor.on('connection', (socket) => {
-  console.log('A user connected to the "editor" namespace');
+// Editor.on('connection', (socket) => {
+//   console.log('A user connected to the "editor" namespace');
 
-  socket.on('editor-change', (content) => { 
-    Editor.emit('editor-change', content);
-  });
+//   socket.on("send-changes", delta => {
+//     socket.emit("receive-changes", delta)
+//   })
 
-  socket.on('disconnect', () => {
-    console.log('A user disconnected from the "editor" namespace');
-  });
-});
+//   socket.on('disconnect', () => {
+//     console.log('A user disconnected from the "editor" namespace');
+//   });
+// });
 
+Editor.on("connection", socket => {
+  console.log("joined to editor component")
+  socket.on("get-document", async documentId => {
+    const document = await findOrCreateDocument(documentId)
+    socket.join(documentId)
+    socket.emit("load-document", document.data)
 
+    socket.on("send-changes", delta => {
+      socket.broadcast.to(documentId).emit("receive-changes", delta)
+    })
 
+    socket.on("save-document", async data => {
+      await Document.findByIdAndUpdate(documentId, { data })
+    })
+  })
+})
 
+async function findOrCreateDocument(id) {
+  if (id == null) return
 
-
+  const document = await Document.findById(id)
+  if (document) return document
+  return await Document.create({ _id: id, data: defaultValue })
+} 
 
 const numberOfClients={};
 videosocket.on('connection', (socket) => {
